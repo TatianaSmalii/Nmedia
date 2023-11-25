@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity() {
             published = "20 июня в 20:30",
             content = "Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетенгу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растем сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остается с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия - помочь встать на путь роста и начать цепочку перемен - http://netolo.gy/fyb",
             LikeByMe = true,//чтобы по умолчанию стоял лайк
-            likes = 90, //90 лайков сейчас
-            repostCount = 999//кол-во репостов
+            likes = 1_000_000, //90 лайков сейчас
+            repostCount = 1_000_000//кол-во репостов
 
         )
 //        //Далее вызываем метод set.OnClickListener
-//        binding.ImageLike.setOnClickListener {
-//            binding.ImageLike.setImageResource(R.drawable.baseline_favorite_24)//передаем ссылку на нашу картинку
+//        binding.Avatar.setOnClickListener {
+//            binding.Avatar.setImageResource(R.drawable.ic_launcher_foreground)//передаем ссылку на нашу картинку
 //        }
 
         //заполняем данными нашу разметку
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             Autor.text = post.author
             Published.text = post.published
             Content.text = post.content
-            likeCount.text = post.likes.toString()
+            likeCount.text = countFormat(post.likes)
             RepostCount.text = countFormat(post.repostCount)
 
             if (post.LikeByMe) {//ставим сердечко
@@ -59,12 +59,12 @@ class MainActivity : AppCompatActivity() {
                 post.LikeByMe = !post.LikeByMe //отметка лайка
                 post.likes += if (post.LikeByMe) 1 else -1 //кол-во лайков
                 like.setImageResource(if (post.LikeByMe) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24)
-                likeCount.text = post.likes.toString()
+                likeCount.text = countFormat(post.likes)
             }
 
             Repost.setOnClickListener{
                 post.repost = !post.repost //отметка репоста
-                post.repostCount += if (post.repost) -1 else 1
+                post.repostCount += if (post.repost) 1 else -1
                 Repost.setImageResource(if (post.repost) R.drawable.baseline_share_24 else R.drawable.baseline_share_black_24)
                 RepostCount.text = countFormat(post.repostCount)
                 //RepostCount.text = post.repostCount.toString()
@@ -77,9 +77,6 @@ class MainActivity : AppCompatActivity() {
                     //}
 
             }
-
-
-
         }
     }
 }
