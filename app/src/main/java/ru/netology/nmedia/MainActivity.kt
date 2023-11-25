@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
             Content.text = post.content
             likeCount.text = countFormat(post.likes)
             RepostCount.text = countFormat(post.repostCount)
+            Avatar.setImageResource(R.drawable.ic_launcher_foreground)
 
             if (post.LikeByMe) {//ставим сердечко
                 like.setImageResource(R.drawable.baseline_favorite_24)
@@ -54,7 +55,9 @@ class MainActivity : AppCompatActivity() {
             if (post.repost) {//если проставлен репост
                 Repost.setImageResource(R.drawable.baseline_share_black_24)//то репост поменяет цвет
             }
-
+            Avatar.setOnClickListener{
+                Avatar.setImageResource(R.drawable.ic_launcher_foreground)
+            }
             like.setOnClickListener {
                 post.LikeByMe = !post.LikeByMe //отметка лайка
                 post.likes += if (post.LikeByMe) 1 else -1 //кол-во лайков
