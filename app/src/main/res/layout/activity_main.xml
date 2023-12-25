@@ -5,41 +5,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/padding_common"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <ImageView
-        android:id="@+id/Avatar"
+        android:id="@+id/avatar"
         android:layout_width="@dimen/Avatar_size"
         android:layout_height="@dimen/Avatar_size"
         android:contentDescription="@string/nmedia"
+        android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintBottom_toBottomOf="@id/barrierBotton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@sample/Posts_avatars" />
 
     <TextView
-        android:id="@+id/Autor"
+        android:id="@+id/autor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding_common"
         android:ellipsize="end"
         android:singleLine="true"
-        app:layout_constraintBottom_toTopOf="@id/Published"
+        app:layout_constraintBottom_toTopOf="@id/published"
         app:layout_constraintEnd_toStartOf="@id/menu"
-        app:layout_constraintStart_toEndOf="@+id/Avatar"
-        app:layout_constraintTop_toTopOf="@id/Avatar"
+        app:layout_constraintStart_toEndOf="@+id/avatar"
+        app:layout_constraintTop_toTopOf="@id/avatar"
         app:layout_constraintVertical_bias="0.517"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="@sample/posts.json/data/author" />
 
     <TextView
-        android:id="@+id/Published"
+        android:id="@+id/published"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_common"
-        app:layout_constraintBottom_toBottomOf="@id/Avatar"
-        app:layout_constraintStart_toEndOf="@+id/Avatar"
-        app:layout_constraintTop_toBottomOf="@+id/Autor"
+        app:layout_constraintBottom_toBottomOf="@id/avatar"
+        app:layout_constraintStart_toEndOf="@+id/avatar"
+        app:layout_constraintTop_toBottomOf="@+id/autor"
         tools:text="@sample/posts.json/data/published" />
 
     <ImageButton
@@ -53,7 +54,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/Content"
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_common"
@@ -66,14 +67,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="Avatar,menu" />
+        app:constraint_referenced_ids="avatar,menu" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier_for_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="Content" />
+        app:constraint_referenced_ids="content" />
 
     <ImageButton
         android:id="@+id/like"
@@ -86,12 +87,12 @@
         app:srcCompat="@drawable/baseline_favorite_border_24" />
 
     <ImageButton
-        android:id="@+id/Image_see"
+        android:id="@+id/image_see"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginStart="600dp"
         app:layout_constraintBottom_toBottomOf="@id/like"
-        app:layout_constraintEnd_toEndOf="@id/Content"
+        app:layout_constraintEnd_toEndOf="@id/content"
         app:layout_constraintEnd_toStartOf="@+id/textView"
         app:layout_constraintStart_toEndOf="@id/textView"
         app:layout_constraintStart_toStartOf="@id/like"
@@ -100,7 +101,7 @@
         app:srcCompat="@drawable/baseline_visibility_24" />
 
     <ImageButton
-        android:id="@+id/Repost"
+        android:id="@+id/repost"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="20dp"
@@ -118,22 +119,22 @@
         android:layout_marginEnd="16dp"
         android:text="5"
         app:layout_constraintBottom_toBottomOf="@id/like"
-        app:layout_constraintEnd_toStartOf="@+id/Repost"
+        app:layout_constraintEnd_toStartOf="@+id/repost"
         app:layout_constraintStart_toEndOf="@id/like"
         app:layout_constraintTop_toBottomOf="@id/like"
         app:layout_constraintTop_toTopOf="@id/like"
         app:layout_constraintVertical_bias="0.404" />
 
     <TextView
-        android:id="@+id/RepostCount"
+        android:id="@+id/repostCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="10"
-        app:layout_constraintBottom_toBottomOf="@id/Repost"
-        app:layout_constraintStart_toEndOf="@+id/Repost"
-        app:layout_constraintTop_toBottomOf="@id/Repost"
-        app:layout_constraintTop_toTopOf="@id/Repost" />
+        app:layout_constraintBottom_toBottomOf="@id/repost"
+        app:layout_constraintStart_toEndOf="@+id/repost"
+        app:layout_constraintTop_toBottomOf="@id/repost"
+        app:layout_constraintTop_toTopOf="@id/repost" />
 
     <TextView
         android:id="@+id/textView"
@@ -142,11 +143,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:text="1500"
-        app:layout_constraintBottom_toBottomOf="@id/Image_see"
-        app:layout_constraintEnd_toEndOf="@id/Content"
-        app:layout_constraintEnd_toStartOf="@id/Autor"
-        app:layout_constraintStart_toEndOf="@+id/Image_see"
-        app:layout_constraintTop_toTopOf="@id/Image_see"
+        app:layout_constraintBottom_toBottomOf="@id/image_see"
+        app:layout_constraintEnd_toEndOf="@id/content"
+        app:layout_constraintEnd_toStartOf="@id/autor"
+        app:layout_constraintStart_toEndOf="@+id/image_see"
+        app:layout_constraintTop_toTopOf="@id/image_see"
         app:layout_constraintVertical_bias="1.0"
         tools:layout_constraintEnd_toEndOf="parent" />
 
