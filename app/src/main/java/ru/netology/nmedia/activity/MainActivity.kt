@@ -1,20 +1,14 @@
 package ru.netology.nmedia.activity
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.util.Log
-import android.widget.ImageButton
-import android.widget.TextView
-import androidx.activity.viewModels
-import ru.netology.nmedia.R
-import ru.netology.nmedia.databinding.ActivityMainBinding
-import ru.netology.nmedia.dto.Post
 //import ru.netology.nmedia.dto.countFormat
 //import ru.netology.nmedia.dto.roundNoDecimal
 //import ru.netology.nmedia.dto.roundWithDecimal
+import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import ru.netology.nmedia.R
+import ru.netology.nmedia.databinding.ActivityMainBinding
 import ru.netology.nmedia.viewmodel.PostViewModel
-import java.math.RoundingMode
-import java.text.DecimalFormat
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,9 +28,9 @@ class MainActivity : AppCompatActivity() {
                 likeCount.text = reduceNumber(post.likes)
                 repostCount.text = reduceNumber(post.repostCount)
                 like.setImageResource(if (post.LikeByMe) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24)
-                likeCount.text = post.likes.toString()
+                //likeCount.text = post.likes.toString()
                 repost.setImageResource(if (post.repost) R.drawable.baseline_share_24 else R.drawable.baseline_share_black_24)
-                repostCount.text = post.repostCount.toString()
+                //repostCount.text = post.repostCount.toString()
                 //avatar.setImageResource(R.drawable.ic_launcher_foreground)
 
 //                binding.root.setOnClickListener {//для обработчика
