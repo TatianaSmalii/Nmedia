@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import ru.netology.nmedia.databinding.ActivityMainBinding
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils
+import ru.netology.nmedia.util.AndroidUtils.focusAndShowKeyboard
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 
@@ -53,9 +55,18 @@ class MainActivity : AppCompatActivity() {
         viewModel.edited.observe(this) {post ->//текст редактируемого поста в поле ввода
             if (post.id != 0L){
                 binding.content.setText(post.content)
-                binding.content.requestFocus()
+                binding.contentText.setText(post.content)
+                binding.group.visibility = View.VISIBLE
+                binding.content.focusAndShowKeyboard()
             }
         }
+       binding.closeEdit.setOnClickListener{
+           binding.group.visibility = View.GONE
+           binding.content.setText("")
+           binding.content.clearFocus()
+           AndroidUtils.hideKeyboard(it)
+       }
+
         binding.save.setOnClickListener {
             val text = binding.content.text.toString()//получаем введенный текст поста
             if (text.isBlank()) {//если текст пустой, тогда нужно показать текст сообщение
@@ -64,6 +75,8 @@ class MainActivity : AppCompatActivity() {
             }
             viewModel.changeContent(text)//а иначе у модели вызываем changeContent, куда передаем обновленный text
             viewModel.save()
+
+            binding.group.visibility = View.GONE
             binding.content.setText("")
             binding.content.clearFocus()//сброс мигания курсора после создания поста
             AndroidUtils.hideKeyboard(it)

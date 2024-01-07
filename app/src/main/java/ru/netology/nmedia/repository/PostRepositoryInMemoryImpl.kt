@@ -128,17 +128,16 @@ class PostRepositoryInMemoryImpl:PostRepository {
         data.value = posts //отображаем откорректированный список
     }
     override fun save (post: Post){
-        if (post.id == 0L) {//добавление поста если ид поста равен нулю
-            posts = listOf(post.copy(
+        posts = if (post.id == 0L) {//добавление поста если ид поста равен нулю
+            listOf(post.copy(
                 id = nextId++,
                 author = "Me",
                 published = "Now",
 
                 ))+posts//прибавляем старый список постов
         } else {
-            posts = posts.map { if (it.id != post.id) it else it.copy(content = post.content) }//обновляем список постов через map
+            posts.map { if (it.id != post.id) it else it.copy(content = post.content) }//обновляем список постов через map
         }
-
         data.value = posts
     }
 }

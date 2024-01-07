@@ -3,7 +3,7 @@
     <string name="nmedia">NMedia!</string>
 
     <string name="hello">Hello World!</string>
-    <string name="description_post_autor_avatar">Post autor avatar</string>
+    <string name="description_post_autor_avatar">Post author avatar</string>
     <string name="description_post_menu">Post menu</string>
     <string name="description_post_like">Like</string>
     <string name="description_post_repost">Repost</string>
@@ -11,9 +11,10 @@
     <string name="menu_remove">Remove</string>
     <string name="post_text">Post Text</string>
     <string name="menu_edit">Edit</string>
+    <string name="description_post_views">See</string>
     <string name="error_empty_content">Contant can\'t be empty/string></string>
-
-
+    <string name="description_post_edit_message">Edit Message</string>
+    <string name="description_post_edit">Edit</string>
 
 
 </resources>
