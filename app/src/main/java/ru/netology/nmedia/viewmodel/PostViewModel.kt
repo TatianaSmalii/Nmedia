@@ -31,10 +31,10 @@ class PostViewModel: ViewModel () {
         edited.value = post
     }
     fun changeContent (content: String) {//изменение содержимого
-        edited.value?.let { post ->
+        edited.value?.let { //post ->
             val text = content.trim()
-            if (text != post.content){
-            edited.value = post.copy(content = text)
+            if (it.content != text){ //if (text != post.content){
+            edited.value = it.copy (content = text)//post.copy(content = text)
             }
         }
     }

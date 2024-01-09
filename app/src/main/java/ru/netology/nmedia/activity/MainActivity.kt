@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -19,7 +20,7 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //println("onCreate $this")
+        println("onCreate $this")
         //работаем с Binding в gradle в нашем проекте
         val binding =
             ActivityMainBinding.inflate(layoutInflater) //получаем Binding и вызываем на нем метод inflate, layoutInflater - свойство активити
@@ -41,8 +42,10 @@ class MainActivity : AppCompatActivity() {
                 viewModel.repost(post.id)
             }
         }
-
         )
+        binding.root.setOnClickListener {//для обработчика
+            Log.d("root", "обработчик на root сработал")
+        }
         binding.list.adapter = adapter
         viewModel.data.observe(this) { posts ->
             val newPost = adapter.currentList.size < posts.size
