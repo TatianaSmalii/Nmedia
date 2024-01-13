@@ -50,28 +50,24 @@ class PostViewHolder (private val binding: CardPostBinding,
 
     fun bind(post: Post) {
         binding.apply{//делаем все на нашей разметке
-            autor.text = post.author
+            author.text = post.author
             published.text = post.published
             content.text = post.content
-            likeCount.text = Number.reduceNumber (post.likes)
+            like.text = Number.reduceNumber (post.likes)
 //          likeCount.text = post.likes.toString()
-            repostCount.text = Number.reduceNumber (post.repostCount)
+            repost.text = Number.reduceNumber (post.repostCount)
 //          repostCount.text = post.repost.toString()
-            like.setImageResource(
-                if (post.LikeByMe) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24
-            )
+
+            like.isChecked = post.LikeByMe
+            repost.isChecked = post.repost
+
             like.setOnClickListener {
-                onInteractionListener.onLike(post)
-//                viewModel.likeById(post.id)
+                onInteractionListener.onLike(post) //viewModel.likeById(post.id)
+            }
+            repost.setOnClickListener{
+                onInteractionListener.onRepost (post) //viewModel.repost(post.id)
             }
 
-            repost.setImageResource(
-                if (post.repost) R.drawable.baseline_share_black_24 else R.drawable.baseline_share_24
-            )
-            repost.setOnClickListener{
-                onInteractionListener.onRepost (post)
-//                viewModel.repost(post.id)
-            }
             menu.setOnClickListener{
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)
