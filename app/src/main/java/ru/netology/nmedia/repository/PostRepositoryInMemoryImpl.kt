@@ -14,9 +14,10 @@ class PostRepositoryInMemoryImpl:PostRepository {
             content = "Освоение новой профессии — это не только открывающиеся возможности и перспективы, но и настоящий вызов самому себе. Приходится выходить из зоны комфорта и перестраивать привычный образ жизни: менять распорядок дня, искать время для занятий, быть готовым к возможным неудачам в начале пути. В блоге рассказали, как избежать стресса на курсах профпереподготовки → http://netolo.gy/fPD",
             published = "23 сентября в 10:12",
             LikeByMe = false,
-//            likes = 1_000, //лайков сейчас
+//          likes = 1_000, //лайков сейчас
             repost = false,
-//            repostCount = 1_000//кол-во репостов
+//          repostCount = 1_000//кол-во репостов
+            video = "https://www.youtube.com/watch?v=mIYoasoNa5M&ab_channel=LosAnimals"
         ),
         Post(
             id = nextId++,
@@ -141,4 +142,3 @@ class PostRepositoryInMemoryImpl:PostRepository {
         data.value = posts
     }
 }
-

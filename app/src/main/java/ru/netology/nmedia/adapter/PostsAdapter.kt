@@ -2,6 +2,7 @@ package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -13,40 +14,41 @@ import ru.netology.nmedia.dto.Number
 
 //создание своего собственно типа для передачи его в параметры
 interface OnInteractionListener {
-    fun onLike (post: Post)
-    fun onEdit (post: Post)
-    fun onRemove (post: Post)
-    fun onRepost (post: Post)
+    fun onLike (post: Post){}
+    fun onEdit (post: Post){}
+    fun onRemove (post: Post){}
+    fun onRepost (post: Post){}
+    fun openVideo(post: Post) {}
 }
 
 //typealias Listener = (Post)-> Unit
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener,
-    ): ListAdapter<Post, PostViewHolder>(PostDiffCallback) {
+): ListAdapter<Post, PostViewHolder>(PostDiffCallback) {
 
-//    //Нужно объявить перед функциями коллекцию из элементов
+    //    //Нужно объявить перед функциями коллекцию из элементов
 //    var list : List <Post> = emptyList()
 //    //переопределяем метод set метод установки значений
 //    set(value) {
 //        field = value//сохраняю значение
 //        notifyDataSetChanged()//уведомление о том что необходимо данные переадресовать
 //    }
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {//отвечает за создание разметки
-            val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return PostViewHolder(binding, onInteractionListener)//возвращаем вывод с этой разметкой
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {//отвечает за создание разметки
+        val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PostViewHolder(binding, onInteractionListener)//возвращаем вывод с этой разметкой
+    }
 
-        override fun onBindViewHolder(holder: PostViewHolder, position: Int) {//функ-я которая связывает текущий пост PostViewHolder с элементом коллекции, с указанной позицией
-    //        val post = list [position]
-            val post = getItem(position)
-            holder.bind (post)
-        }
+    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {//функ-я которая связывает текущий пост PostViewHolder с элементом коллекции, с указанной позицией
+        //        val post = list [position]
+        val post = getItem(position)
+        holder.bind (post)
+    }
 
 //      override fun getItemCount() = list.size //возращает размер этого списка(сколько постов необходимо на экране отображать
 }
 class PostViewHolder (private val binding: CardPostBinding,
                       private val onInteractionListener: OnInteractionListener
-                      ): RecyclerView.ViewHolder (binding.root){
+): RecyclerView.ViewHolder (binding.root){
 
     fun bind(post: Post) {
         binding.apply{//делаем все на нашей разметке
@@ -60,6 +62,12 @@ class PostViewHolder (private val binding: CardPostBinding,
 
             like.isChecked = post.LikeByMe
             repost.isChecked = post.repost
+
+            if (post.video.isNullOrEmpty()){
+                binding.videoLayout.visibility = View.GONE
+            } else {
+                binding.videoLayout.visibility = View.VISIBLE
+            }
 
             like.setOnClickListener {
                 onInteractionListener.onLike(post) //viewModel.likeById(post.id)
@@ -85,6 +93,13 @@ class PostViewHolder (private val binding: CardPostBinding,
                         }
                     }
                 }.show()
+            }
+            videoButton.setOnClickListener {
+                onInteractionListener.openVideo(post)
+            }
+
+            video.setOnClickListener {
+                onInteractionListener.openVideo(post)
             }
         }
     }

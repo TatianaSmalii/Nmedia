@@ -9,4 +9,6 @@ data class Post (
     val likes: Int = 0,//кол-во лайков, значение по умолчанию 0
     val repost: Boolean =true,//был ли проставлен репост
     val repostCount: Int =0, //количество репостов
+    val views: Int = 0,
+    val video: String = "",
 )
