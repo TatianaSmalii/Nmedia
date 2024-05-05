@@ -27,6 +27,7 @@ class PostRepositoryInMemoryImpl:PostRepository {
             LikeByMe = false,
 //            likes = 1_000_000, //лайков сейчас
             repost = false,
+            video = "https://www.youtube.com/watch?v=mIYoasoNa5M&ab_channel=LosAnimals"
 //            repostCount = 1_000_000//кол-во репостов
         ),
         Post(

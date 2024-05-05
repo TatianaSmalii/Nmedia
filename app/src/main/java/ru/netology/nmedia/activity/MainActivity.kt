@@ -3,7 +3,6 @@ package ru.netology.nmedia.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -30,14 +29,24 @@ class MainActivity : AppCompatActivity() {
         //val viewModel by viewModels <PostViewModel> ()
         val viewModel: PostViewModel by viewModels()
 
-        val newPostContract = registerForActivityResult(NewPostActivityContract()) { result ->
+        val newPostContract = registerForActivityResult(NewPostContract) {result ->
             result ?: return@registerForActivityResult
-            viewModel.changeContentAndSave(result)
+            viewModel.changeContent(result)
+//            viewModel.save()
+
+        }
+//        val newPostContract = registerForActivityResult(NewPostActivityContract()) { result ->
+//            result ?: return@registerForActivityResult
+//            viewModel.changeContentAndSave(result)
+//        }
+//
+        val editPostContract = registerForActivityResult(EditPostActivityContract()) { result ->
+            result?.let { viewModel.changeContentAndSave(result) }
+                ?:viewModel.cancelEdit()
+        //            result ?: return@registerForActivityResult
+        //            viewModel.changeContentAndSave(result)
         }
 
-        val editPostContract = registerForActivityResult(EditPostActivityContract()) { result ->
-            result?.let{viewModel.changeContentAndSave(result)} ?: viewModel.cancelEdit()
-        }
 
         val adapter = PostsAdapter( object : OnInteractionListener{
             override fun onLike(post: Post) {
@@ -113,6 +122,9 @@ class MainActivity : AppCompatActivity() {
             binding.content.setText("")
             binding.content.clearFocus()//сброс мигания курсора после создания поста
             AndroidUtils.hideKeyboard(it)
+        }
+        binding.save.setOnClickListener{
+            newPostContract.launch()
         }
     }
 }

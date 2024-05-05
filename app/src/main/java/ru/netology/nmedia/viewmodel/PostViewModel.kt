@@ -1,6 +1,5 @@
 package ru.netology.nmedia.viewmodel
 
-import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.netology.nmedia.dto.Post
@@ -15,6 +14,7 @@ private val empty = Post (
     repost = false,
 )
 class PostViewModel: ViewModel () {
+
     //создаем репозиторий
     private val repository:PostRepository = PostRepositoryInMemoryImpl()
     val data = repository.getAll()
@@ -40,6 +40,17 @@ class PostViewModel: ViewModel () {
         }
     }
     fun cancelEdit() {
+        edited.value = empty
+    }
+    fun changeContentAndSave (content: String) {
+        val text = content.trim()
+        if (edited.value?.content == text){
+            edited.value = empty
+            return
+        }
+        edited.value?.let {
+            repository.save(it.copy(content = text))
+        }
         edited.value = empty
     }
 }
