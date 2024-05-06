@@ -20,6 +20,20 @@ class PostRepositoryFileImpl(private val context: Context):PostRepository {
             field = value
             sync()
         }
+    init {
+        val file = context.filesDir.resolve(filename)
+        if (file.exists()) {
+            context.openFileInput(filename).bufferedReader().use {
+                posts = gson.fromJson(it, type)
+                if (posts.isEmpty()){
+                    nextId = 1L
+                } else {
+                    nextId = posts.maxOf { it.id } + 1
+                }
+                data.value = posts
+            }
+        }
+    }
 
     private val data = MutableLiveData (posts)
     override fun getAll(): LiveData <List<Post>> = data
