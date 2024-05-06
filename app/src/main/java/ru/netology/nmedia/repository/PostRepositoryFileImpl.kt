@@ -20,6 +20,7 @@ class PostRepositoryFileImpl(private val context: Context):PostRepository {
             field = value
             sync()
         }
+    private val data = MutableLiveData (posts)
     init {
         val file = context.filesDir.resolve(filename)
         if (file.exists()) {
@@ -35,7 +36,7 @@ class PostRepositoryFileImpl(private val context: Context):PostRepository {
         }
     }
 
-    private val data = MutableLiveData (posts)
+
     override fun getAll(): LiveData <List<Post>> = data
     override fun likeById(id: Long) {
         posts = posts.map {
