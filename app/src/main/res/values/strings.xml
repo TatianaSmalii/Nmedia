@@ -1,20 +1,36 @@
 <resources>
     <string name="app_name">Nmedia</string>
     <string name="nmedia">NMedia!</string>
-
-    <string name="hello">Hello World!</string>
-    <string name="description_post_autor_avatar">Post author avatar</string>
+    <string name="description_post_author_avatar">Post author avatar</string>
     <string name="description_post_menu">Post menu</string>
     <string name="description_post_like">Like</string>
-    <string name="description_post_repost">Repost</string>
+    <string name="description_post_share">Share</string>
+    <string name="description_post_views">Viewed</string>
     <string name="description_post_save">Save</string>
+    <string name="description_post_add">Add</string>
+    <string name="description_post_edit">Edit</string>
+    <string name="description_post_edit_message">Edit Message</string>
     <string name="menu_remove">Remove</string>
+
     <string name="post_text">Post Text</string>
     <string name="menu_edit">Edit</string>
-    <string name="description_post_views">See</string>
-    <string name="error_empty_content">Contant can\'t be empty/string></string>
-    <string name="description_post_edit_message">Edit Message</string>
-    <string name="description_post_edit">Edit</string>
+    <string name="error_empty_content">Content can\'t be empty</string>
+    <string name="chooser_share_post">Choose app for sending</string>
+    <string name="empty_text_error">Text must not be blank</string>
+    <string name="cancel_edit_message">Are you sure you want to cancel changes?</string>
+    <string name="cancel_edit_title">Unsaved Changes</string>
+    <string name="description_post_was_edited">edited</string>
 
+    <string name="google_play_unavailable">Google Api Unavailable</string>
+    <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
+    <string name="notification_user_newpost">%1$s published a new post:</string>
+    <string name="channel_remote_name">Server notifications</string>
+    <string name="channel_remote_description">Notifications from remote server</string>
 
+    <string name="choice_yes">Yes</string>
+    <string name="choice_no">No</string>
+
+    <string name="retry_loading">Retry</string>
+    <string name="empty_posts">There are no posts.\nIf you create a new post, it will appear here</string>
+    <string name="error_loading">Something went wrong. Try again later</string>
 </resources>

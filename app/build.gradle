@@ -198,6 +198,7 @@ dependencies {//
 
     implementation platform('com.google.firebase:firebase-bom:33.1.2')
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     def core_version = "1.13.1"
     def appcompat_version = "1.6.1"
@@ -232,8 +233,8 @@ dependencies {//
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-//    implementation platform("com.google.firebase:firebase-bom:$firebase_version")
-//    implementation "com.google.firebase:firebase-messaging-ktx"
+    implementation platform("com.google.firebase:firebase-bom:$firebase_version")
+    implementation "com.google.firebase:firebase-messaging-ktx"
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation "com.google.android.gms:play-services-base:$play_services_base_version"
 

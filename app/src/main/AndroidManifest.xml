@@ -16,7 +16,7 @@
             android:name=".activity.EditPostActivityContract"
             android:exported="false" />
         <activity
-            android:name=".activity.EditPostActivity"
+            android:name=".activity.EditPostFragment"
             android:exported="false" />
         <activity
             android:name=".activity.NewPostActivity"
