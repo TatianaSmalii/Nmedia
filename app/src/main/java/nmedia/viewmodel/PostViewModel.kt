@@ -90,7 +90,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value?.let {
             thread {
                 repository.save(it)
-                loadPosts()
+                _postCreated.postValue(Unit) // Это событие ожидается для навигации назад и запроса полного списка постов
                 edited.postValue(empty)
             }
         }
