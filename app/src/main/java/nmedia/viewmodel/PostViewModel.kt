@@ -1,102 +1,133 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
-import android.content.Context
-import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.material.internal.ContextUtils.getActivity
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
+import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
-import java.io.IOException
-import java.time.LocalDateTime
-import kotlin.concurrent.thread
+import java.time.OffsetDateTime
 
 private val empty = Post(
-    id = 0,
     content = "",
-    author = "",
-    published = "",
+    author = "Student",
+    published = OffsetDateTime.now().toEpochSecond(),
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: PostRepository = PostRepositoryImpl()
-    private val _state = MutableLiveData(FeedModel())
-    val data: LiveData<FeedModel>
+    var id = 0L
+
+    private val repository: PostRepository =
+        PostRepositoryImpl(AppDb.getInstance(application).postDao())
+
+    private val _state = MutableLiveData(FeedModelState())
+    val state: LiveData<FeedModelState>
         get() = _state
+
+    val data: LiveData<FeedModel> = repository.data.map {
+        FeedModel(it, it.isEmpty())
+    }
+
     val edited = MutableLiveData(empty)
     private var draft: String = ""
+
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
     init {
+        deleteUnsavedPosts()
         loadPosts()
+    }
+
+    fun deleteUnsavedPosts(){
+        viewModelScope.launch {
+            repository.deleteUnsavedPosts()
+        }
     }
 
 
     fun loadPosts() {
-        _state.value = (FeedModel(loading = true))
-        repository.getAllAsync(object : PostRepository.Callback<List<Post>> {
-            override fun onSuccess(data: List<Post>) {
-                _state.value = FeedModel(posts = data, empty = data.isEmpty())
+        _state.value = (FeedModelState(loading = true))
+        viewModelScope.launch {
+            try {
+                repository.getAll()
+                _state.value = FeedModelState()
+            } catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
             }
-
-            override fun onError(e: Exception) {
-                _state.value = FeedModel(error = true)
-            }
-        })
-    }
-
-    fun removeByIdAsync(id: Long) {
-        val old = _state.value?.posts.orEmpty()
-        repository.removeById(id, object : PostRepository.Callback<Unit> {
-            override fun onSuccess(unit: Unit) {
-                _state.value = FeedModel(posts = _state.value?.posts.orEmpty()
-                    .filter { it.id != id }
-                )
-            }
-
-            override fun onError(e: Exception) {
-                _state.value = FeedModel(posts = old, errorOfDelete = true)
-            }
-        })
-    }
-
-    fun savePostAsync() {
-        val posts = _state.value?.posts.orEmpty()
-        _state.value = FeedModel(loading = true)
-        // сохранение поста в репозитории
-        edited.value?.let {
-            repository.save(it, object : PostRepository.Callback<Post> {
-                override fun onSuccess(data: Post) {
-                    _state.value = FeedModel(posts = listOf(data) + posts)
-                }
-                override fun onError(e: Exception) {
-                    _state.value = FeedModel(posts = posts, errorOfSave = true)
-                }
-            })
-            edited.postValue(empty)
-            _postCreated.value = Unit
         }
     }
 
-    fun likeByPostAsync(post: Post) {
-        repository.likeById(post, object : PostRepository.Callback<Post>{
-            override fun onSuccess(data: Post) {
-                _state.value = (FeedModel(posts = _state.value?.posts.orEmpty()
-                    .map{ if (it.id == post.id) data else it }))
+    fun refresh() {
+        _state.value = (FeedModelState(refreshing = true))
+        viewModelScope.launch {
+            try {
+                repository.getAll()
+                _state.value = FeedModelState()
+            } catch (e: Exception) {
+                _state.value = FeedModelState(error = true)
             }
+        }
+    }
 
-            override fun onError(e: Exception) {
-                _state.value = FeedModel(error = true)
+    fun loadUnsavedPosts(){
+        viewModelScope.launch {
+            repository.getUnsavedPosts().map {
+                try {
+                    repository.save(it)
+                    _state.value = FeedModelState()
+                } catch (e: Exception) {
+                    _state.value = FeedModelState(errorOfSave = true, post = it)
+                }
             }
-        })
+        }
+    }
+
+    fun save() {
+        edited.value?.let {
+            _postCreated.value = Unit
+            viewModelScope.launch {
+                try {
+                    repository.save(it)
+                    _state.value = FeedModelState()
+                } catch (e: Exception) {
+                    _state.value = FeedModelState(errorOfSave = true, post = it)
+                }
+            }
+        }
+        edited.value = empty
+    }
+
+    fun removeById(id: Long) {
+        viewModelScope.launch {
+            try {
+                repository.removeById(id)
+                _state.value = FeedModelState()
+            } catch (e: Exception){
+                _state.value = FeedModelState(errorOfDelete = true, id = id)
+            }
+        }
+    }
+
+    fun likeById(post: Post) {
+        viewModelScope.launch {
+            try {
+                repository.likeById(post)
+                _state.value = FeedModelState()
+            } catch (e: Exception){
+                _state.value = FeedModelState(errorOfLike = true, post = post)
+
+            }
+        }
     }
 
     // функция наполнения и сохранения нового поста
@@ -109,7 +140,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         // наполнение данными нового поста
-        edited.value = edited.value?.copy(content = text)
+        edited.value = edited.value?.copy(id = id, content = text)
+        id--
     }
 
     // функция редактирования (edited = редактируемый пост)
@@ -130,20 +162,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value = edited.value?.copy(content = text)
     }
 
-//    fun savePost() {
-//        // функция поиска ссылки на youtube и присваивание значения ссылки свойству video у поста
-//        // isVideoExists(content)
-//
-//        // сохранение поста в репозитории
-//        edited.value?.let {
-//            thread {
-//                repository.save(it)
-//                //loadPosts()
-//                edited.postValue(empty)
-//            }
-//        }
-//    }
-
     fun cancelEdit() {
         edited.value = empty
     }
@@ -160,27 +178,4 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun getDraft(): String {
         return draft
     }
-
-    fun share(id: Long) = repository.share(id)
-
-//    private fun isVideoExists(content: String) {
-//        if (content.lowercase().contains("https://www.youtu") ||
-//            content.lowercase().contains("https://youtu") ||
-//            content.lowercase().contains("http://www.youtu") ||
-//            content.lowercase().contains("http://youtu")
-//        ) {
-//            val partsOfContent = content.split("\\s".toRegex())
-//            for (part in partsOfContent) {
-//                if (part.lowercase().startsWith("https://www.youtu") ||
-//                    part.lowercase().startsWith("https://youtu") ||
-//                    part.lowercase().startsWith("http://www.youtu") ||
-//                    part.lowercase().startsWith("http://youtu")
-//                ) {
-//                    edited.value = edited.value?.copy(video = part)
-//                }
-//            }
-//        } else {
-//            edited.value = edited.value?.copy(video = "")
-//        }
-//    }
 }

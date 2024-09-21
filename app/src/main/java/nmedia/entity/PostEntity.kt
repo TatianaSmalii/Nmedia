@@ -6,16 +6,17 @@ import ru.netology.nmedia.dto.Post
 
 @Entity
 data class PostEntity constructor(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     val id: Long,
     val author: String,
     val authorAvatar: String,
     val content: String,
-    val published: String,
+    val published: Long,
     val likedByMe: Boolean,
     val likes: Int,
     val share: Int,
     val views: Int,
+    val isSaved: Boolean
     //val video: String,
 ){
     fun toDto(): Post  = Post(
@@ -42,7 +43,8 @@ data class PostEntity constructor(
                 likedByMe = likedByMe,
                 likes = likes,
                 share = share,
-                views = views
+                views = views,
+                isSaved = true
                 //video = video
             )
         }

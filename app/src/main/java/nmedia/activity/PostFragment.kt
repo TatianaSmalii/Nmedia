@@ -49,14 +49,12 @@ class PostFragment : Fragment() {
             }
 
             override fun onRemove(post: Post) {
-//              viewModel.removeById(post.id)
-                viewModel.removeByIdAsync(post.id)
+                viewModel.removeById(post.id)
                 findNavController().navigateUp()
             }
 
             override fun onLike(post: Post) {
-//                viewModel.likeById(post.id)
-                viewModel.likeByPostAsync(post)
+                viewModel.likeById(post)
             }
 
             override fun onShare(post: Post) {
@@ -68,7 +66,7 @@ class PostFragment : Fragment() {
 
                 val shareIntent = Intent.createChooser(intent, null)
                 startActivity(shareIntent)
-                viewModel.share(post.id)
+                //viewModel.share(post.id)
             }
 
             // открытие ссылки в youtube по клику на кнопку и поле картинки
@@ -101,6 +99,5 @@ class PostFragment : Fragment() {
 //        }
 
         return binding.root
-
     }
 }
