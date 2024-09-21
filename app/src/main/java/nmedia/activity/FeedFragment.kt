@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.EditPostFragment.Companion.contentArg
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
@@ -47,12 +48,10 @@ class FeedFragment : Fragment() {
             }
 
             override fun onRemove(post: Post) {
-                //viewModel.removeById(post.id)
                 viewModel.removeByIdAsync(post.id)
             }
 
             override fun onLike(post: Post) {
-                //viewModel.likeById(post.id)
                 viewModel.likeByPostAsync(post)
             }
 
@@ -97,6 +96,16 @@ class FeedFragment : Fragment() {
             binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
+            if (state.errorOfSave) {
+                Snackbar.make(binding.root, "Не удалось сохранить пост", Snackbar.LENGTH_LONG)
+                    .setAnchorView(binding.newPostButton)
+                    .show()
+            }
+            if (state.errorOfDelete) {
+                Snackbar.make(binding.root, "Не удалось удалить пост", Snackbar.LENGTH_LONG)
+                    .setAnchorView(binding.newPostButton)
+                    .show()
+            }
         }
 
         binding.retryButton.setOnClickListener {

@@ -1,9 +1,13 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.content.Context
+import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.internal.ContextUtils.getActivity
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.PostRepository
@@ -40,69 +44,60 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         _state.value = (FeedModel(loading = true))
         repository.getAllAsync(object : PostRepository.Callback<List<Post>> {
             override fun onSuccess(data: List<Post>) {
-                _state.postValue(FeedModel(posts = data, empty = data.isEmpty()))
+                _state.value = FeedModel(posts = data, empty = data.isEmpty())
             }
 
             override fun onError(e: Exception) {
-                _state.postValue(FeedModel(error = true))
+                _state.value = FeedModel(error = true)
             }
         })
     }
+
     fun removeByIdAsync(id: Long) {
-//        _state.postValue(
-//            _state.value?.copy(posts = _state.value?.posts.orEmpty()
-//                .filter { it.id != id }
-//            )
-//        )
-//        repository.removeByIdAsync(id, object : PostRepository.Callback<Long>{})
-//    }
         val old = _state.value?.posts.orEmpty()
-        repository.removeByIdAsync(id, object : PostRepository.Callback<Long> {
-            override fun onSuccess(data: Long) {
-                _state.postValue(FeedModel(posts = _state.value?.posts.orEmpty()
+        repository.removeById(id, object : PostRepository.Callback<Unit> {
+            override fun onSuccess(unit: Unit) {
+                _state.value = FeedModel(posts = _state.value?.posts.orEmpty()
                     .filter { it.id != id }
-                )
                 )
             }
 
             override fun onError(e: Exception) {
-                _state.postValue(FeedModel(posts = old))
+                _state.value = FeedModel(posts = old, errorOfDelete = true)
             }
         })
     }
 
     fun savePostAsync() {
         val posts = _state.value?.posts.orEmpty()
-        _state.value = (FeedModel(loading = true))
+        _state.value = FeedModel(loading = true)
         // сохранение поста в репозитории
         edited.value?.let {
-            repository.saveAsync(it, object : PostRepository.Callback<Post> {
+            repository.save(it, object : PostRepository.Callback<Post> {
                 override fun onSuccess(data: Post) {
-                    _state.postValue(FeedModel(posts = listOf(data) + posts)
-                    )
+                    _state.value = FeedModel(posts = listOf(data) + posts)
                 }
                 override fun onError(e: Exception) {
-                    _state.postValue(FeedModel(error = true))
+                    _state.value = FeedModel(posts = posts, errorOfSave = true)
                 }
             })
             edited.postValue(empty)
-
+            _postCreated.value = Unit
         }
     }
 
     fun likeByPostAsync(post: Post) {
-        repository.likeByPostAsync(post, object : PostRepository.Callback<Post>{
+        repository.likeById(post, object : PostRepository.Callback<Post>{
             override fun onSuccess(data: Post) {
-                _state.postValue(FeedModel(posts = _state.value?.posts.orEmpty()
+                _state.value = (FeedModel(posts = _state.value?.posts.orEmpty()
                     .map{ if (it.id == post.id) data else it }))
             }
 
             override fun onError(e: Exception) {
-                _state.postValue(FeedModel(error = true))
+                _state.value = FeedModel(error = true)
             }
         })
     }
-
 
     // функция наполнения и сохранения нового поста
     fun configureNewPost(content: String) {
@@ -123,7 +118,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // функция сохранения изменений при редактировании поста
-    fun editPost(content: String) {//
+    fun editPost(content: String) {
         // trim = обрезка пробелов в конце/спереди
         val text = content.trim()
         // если изменений не было: очистка edited, выход из фукнции
@@ -143,13 +138,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //        edited.value?.let {
 //            thread {
 //                repository.save(it)
-//                _postCreated.postValue(Unit) // Это событие ожидается для навигации назад и запроса полного списка постов
+//                //loadPosts()
 //                edited.postValue(empty)
 //            }
 //        }
-//
-//        // очистка edited
-//        edited.value = empty
 //    }
 
     fun cancelEdit() {
@@ -169,45 +161,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         return draft
     }
 
-//    fun removeById(id: Long) {
-//        thread {
-//            val old = _state.value?.posts.orEmpty()
-//            _state.postValue(
-//                FeedModel(
-//                    posts = _state.value?.posts.orEmpty().filter { it.id != id })
-//            )
-//            try {
-//                repository.removeById(id)
-//            } catch (e: IOException) {
-//                _state.postValue(FeedModel(posts = old))
-//            }
-//        }
-
-//        thread {
-//            val old = _state.value?.posts.orEmpty()
-//            _state.postValue(
-//                _state.value?.copy(posts = _state.value?.posts.orEmpty()
-//                    .filter { it.id != id }
-//                )
-//            )
-//            try {
-//                repository.removeById(id)
-//            } catch (e: IOException) {
-//                _state.postValue(_state.value?.copy(posts = old))
-//            }
-//        }
-//    }
-
-//    fun likeById(id: Long) {
-//        thread {
-//            val postLiked = repository.likeById(id)
-//            _state.postValue(FeedModel(posts = _state.value?.posts.orEmpty()
-//                .map{ if (it.id == id) postLiked else it }))
-//
-//        }
-//    }
-
-fun share(id: Long) = repository.share(id)
+    fun share(id: Long) = repository.share(id)
 
 //    private fun isVideoExists(content: String) {
 //        if (content.lowercase().contains("https://www.youtu") ||
