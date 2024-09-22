@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -48,12 +49,10 @@ class FeedFragment : Fragment() {
             }
 
             override fun onRemove(post: Post) {
-//                viewModel.removeByIdDB(post.id)
                 viewModel.removeById(post.id)
             }
 
             override fun onLike(post: Post) {
-//                viewModel.likeByIdDB(post)
                 viewModel.likeById(post)
             }
 
@@ -69,16 +68,6 @@ class FeedFragment : Fragment() {
                 //viewModel.share(post.id)
             }
 
-            // открытие ссылки в youtube по клику на кнопку и поле картинки
-//            override fun openVideo(post: Post) {
-//                val webpage: Uri = Uri.parse(post.video)
-//                val intent = Intent(Intent.ACTION_VIEW, webpage)
-//                try {
-//                    startActivity(intent)
-//                } catch (e: ActivityNotFoundException) {
-//                    Toast.makeText(context, "No suitable app found!", Toast.LENGTH_SHORT).show()
-//                }
-//            }
 
             // переход на фрагмент поста по клику на пост (кроме работающих кнопок) с передачей id поста через ключ idArg
             override fun onRoot(post: Post) {
@@ -101,8 +90,10 @@ class FeedFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
             binding.swiperefresh.isRefreshing = state.refreshing
+
+            if (state.isSaved) {binding.list.smoothScrollToPosition(0)}
             if (state.error) {
-                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) {
                         viewModel.refresh()
                     }
@@ -131,7 +122,22 @@ class FeedFragment : Fragment() {
             }
         }
 
+        viewModel.newerCount.observe(viewLifecycleOwner){count ->
+            if (count > 0) {
+                binding.newPosts.setText(getString(R.string.new_posts) + " (" + count + ")")
+                binding.newPosts.isVisible = true
+            } else binding.newPosts.isGone = true
+        }
+
+
+        binding.newPosts.setOnClickListener{
+            viewModel.updateNewPost()
+            binding.list.smoothScrollToPosition(0)
+            binding.newPosts.isGone = true
+        }
+
         binding.swiperefresh.setOnRefreshListener {
+            viewModel.loadUnsavedPosts()
             viewModel.refresh()
         }
 

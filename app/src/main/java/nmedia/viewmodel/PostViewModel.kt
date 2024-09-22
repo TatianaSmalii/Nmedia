@@ -4,8 +4,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
@@ -18,13 +22,10 @@ import java.time.OffsetDateTime
 
 private val empty = Post(
     content = "",
-    author = "Student",
-    published = OffsetDateTime.now().toEpochSecond(),
+    author = "Student"
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
-    var id = 0L
-
     private val repository: PostRepository =
         PostRepositoryImpl(AppDb.getInstance(application).postDao())
 
@@ -32,8 +33,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val state: LiveData<FeedModelState>
         get() = _state
 
-    val data: LiveData<FeedModel> = repository.data.map {
-        FeedModel(it, it.isEmpty())
+    val data: LiveData<FeedModel> = repository.data
+        .map(::FeedModel)
+        .catch { it.printStackTrace() }
+        .asLiveData(Dispatchers.Default)
+
+    val newerCount: LiveData<Int> = data.switchMap {
+        repository.getNewerCount()
+            .catch { _state.postValue(FeedModelState(error = true))}
+            .asLiveData(Dispatchers.Default, 100)
     }
 
     val edited = MutableLiveData(empty)
@@ -67,6 +75,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateNewPost(){
+        viewModelScope.launch {
+            repository.updateNewPosts()
+        }
+    }
+
     fun refresh() {
         _state.value = (FeedModelState(refreshing = true))
         viewModelScope.launch {
@@ -86,21 +100,21 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     repository.save(it)
                     _state.value = FeedModelState()
                 } catch (e: Exception) {
-                    _state.value = FeedModelState(errorOfSave = true, post = it)
+                    _state.value = FeedModelState(errorOfSave = true)
                 }
             }
         }
     }
 
     fun save() {
-        edited.value?.let {
+        edited.value?.copy(published = OffsetDateTime.now().toEpochSecond()).let {
             _postCreated.value = Unit
             viewModelScope.launch {
                 try {
-                    repository.save(it)
+                    it?.let { post -> repository.save(post) }
                     _state.value = FeedModelState()
                 } catch (e: Exception) {
-                    _state.value = FeedModelState(errorOfSave = true, post = it)
+                    _state.value = FeedModelState(errorOfSave = true)
                 }
             }
         }
@@ -140,8 +154,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         // наполнение данными нового поста
-        edited.value = edited.value?.copy(id = id, content = text)
-        id--
+        edited.value = edited.value?.copy(content = text)
     }
 
     // функция редактирования (edited = редактируемый пост)
@@ -158,8 +171,18 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             edited.value = empty
             return
         }
-        // сохранение нового текста (text) в содержимое поста (content) через функцию сохранения в PostRepository (File, In Memory)
-        edited.value = edited.value?.copy(content = text)
+
+        edited.value?.copy(content = text).let {
+            viewModelScope.launch {
+                try {
+                    it?.let { post -> repository.saveEditedPost(post) }
+                    _state.value = FeedModelState()
+                } catch (e: Exception) {
+                    _state.value = FeedModelState(errorOfEdit = true)
+                }
+            }
+        }
+        edited.value = empty
     }
 
     fun cancelEdit() {

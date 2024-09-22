@@ -21,6 +21,7 @@ class EditPostFragment : Fragment() {
     companion object {
         var Bundle.contentArg: String? by StringArg
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,11 +44,8 @@ class EditPostFragment : Fragment() {
         // обработка кнопки "сохранить/save"
         binding.save.setOnClickListener {
             if (!binding.content.text.isNullOrBlank()) {
-                // присвоение текста из окна редактирования в переменную
-                val newContent = binding.content.text.toString()
                 // сохранение текста в пост (в PostViewModel)
-                viewModel.editPost(newContent)
-                //viewModel.savePost()
+                viewModel.editPost(binding.content.text.toString())
             } else {
                 // если текст пустой, то пост не сохраняем и очищаем edited
                 viewModel.cancelEdit()

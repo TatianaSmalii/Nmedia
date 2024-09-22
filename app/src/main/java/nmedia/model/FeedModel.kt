@@ -14,6 +14,8 @@ data class FeedModelState(
     val errorOfLike: Boolean = false,
     val errorOfDelete: Boolean = false,
     val refreshing: Boolean = false,
+    val errorOfEdit: Boolean = false,
+    val isSaved: Boolean = false,
     val id: Long = 0,
     val post: Post? = null,
 )

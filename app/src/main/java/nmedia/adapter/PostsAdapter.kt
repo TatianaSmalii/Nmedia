@@ -14,6 +14,7 @@ import ru.netology.nmedia.dto.Number
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.handler.loadAttachment
 import ru.netology.nmedia.handler.loadAvatars
+import ru.netology.nmedia.dto.PublishedDateTime
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
@@ -21,8 +22,6 @@ interface OnInteractionListener {
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
     fun onRoot(post: Post) {}
-
-    fun openVideo(post: Post) {}
 }
 
 class PostsAdapter(
@@ -49,7 +48,7 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             author.text = post.author
-            published.text = post.published.toString() //PublishedDateTime.getTime(post.published)
+            published.text = PublishedDateTime.getTime(post.published)
             content.text = post.content
             like.text = Number.setNumberView(post.likes)
             share.text = Number.setNumberView(post.share)
@@ -71,6 +70,10 @@ class PostViewHolder(
             }
 
             if (post.id > 0) {
+                like.isClickable = true
+                share.isClickable = true
+                waitLoad.visibility = View.GONE
+
                 like.setOnClickListener {
                     onInteractionListener.onLike(post)
                 }
@@ -86,12 +89,12 @@ class PostViewHolder(
                 content.setOnClickListener {
                     onInteractionListener.onRoot(post)
                 }
-
-                waitLoad.visibility = View.GONE
             } else {
+                like.isClickable = false
+                share.isClickable = false
                 waitLoad.visibility = View.VISIBLE
-            }
 
+            }
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.options_post)

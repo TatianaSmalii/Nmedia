@@ -16,7 +16,7 @@ data class PostEntity constructor(
     val likes: Int,
     val share: Int,
     val views: Int,
-    val isSaved: Boolean
+    var isNewPost: Boolean
     //val video: String,
 ){
     fun toDto(): Post  = Post(
@@ -44,9 +44,12 @@ data class PostEntity constructor(
                 likes = likes,
                 share = share,
                 views = views,
-                isSaved = true
+                isNewPost = false,
                 //video = video
             )
         }
     }
 }
+
+fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
+fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)
