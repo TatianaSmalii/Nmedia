@@ -10,7 +10,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Media
-import ru.netology.nmedia.dto.MediaUpload
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
@@ -52,10 +51,10 @@ class PostRepositoryImpl(
         )
     }
 
-    override fun getNewerCount(): Flow<Int> = flow {
+    override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {
-            delay(10_000L)
-            val response = PostsApi.retrofitService.getNewer(postDao.findMaxId())
+            delay(120_000L)
+            val response = PostsApi.retrofitService.getNewer(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }

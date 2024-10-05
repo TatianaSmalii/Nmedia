@@ -6,13 +6,30 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.activity.viewModels
+import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.ActivityAppBinding
+import ru.netology.nmedia.viewmodel.AuthViewModel
+import ru.netology.nmedia.viewmodel.SignInViewModel
 
 class AppActivity : AppCompatActivity() {
+
+    val viewModel by viewModels<AuthViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,8 +62,49 @@ class AppActivity : AppCompatActivity() {
 
         }
 
+//      // обновление (принудительное) меню (items) в корутине при изменении данных модели AppViewModel
+        lifecycleScope.launch {
+            // корутина работает только при открытом приложении
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.data.collect {
+                    invalidateOptionsMenu()
+                }
+            }
+        }
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate((R.menu.main_menu), menu)
+            }
+
+            override fun onPrepareMenu(menu: Menu) {
+                menu.setGroupVisible(R.id.authenticated, viewModel.authenticated)
+                menu.setGroupVisible(R.id.unauthenticated, !viewModel.authenticated)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                when (menuItem.itemId) {
+                    R.id.signin -> {
+                        findNavController(R.id.nav_host_fragment_container).navigate(R.id.signInFragmentForNav)
+                        true
+                    }
+
+                    R.id.signup -> {
+                        AppAuth.getInstance().setAuth(5, "x-token")
+                        true
+                    }
+
+                    R.id.signout -> {
+                        AppAuth.getInstance().removeAuth()
+                        true
+                    }
+
+                    else -> false
+                }
+        })
+
         requestNotificationsPermission()
     }
+
 
     private fun requestNotificationsPermission() {
         // tiramisu - andoid 13. До этой верссии запроса на уведомления не нужно
