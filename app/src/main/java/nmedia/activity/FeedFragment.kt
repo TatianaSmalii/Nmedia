@@ -1,5 +1,6 @@
 package ru.netology.nmedia.activity
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
@@ -24,7 +26,7 @@ import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.util.AndroidUtils
+import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 
@@ -36,6 +38,23 @@ class FeedFragment : Fragment() {
     ): View {
         val binding = FragmentFeedBinding.inflate(layoutInflater, container, false)
         val viewModel: PostViewModel by activityViewModels()
+        val authViewModel by viewModels<AuthViewModel>()
+
+        // диалоговое окно для аутентификации при like или создании поста
+        val dialogBuilder: AlertDialog.Builder = AlertDialog.Builder(context)
+        dialogBuilder
+            .setTitle("You need to sign in to continue")
+            .setNegativeButton("back") { dialog, _ ->
+                dialog.cancel()
+
+            }
+            .setPositiveButton("Sign In") { dialog, _ ->
+                findNavController().navigate(R.id.signInFragmentForNav)
+
+            }
+
+        val dialog: AlertDialog = dialogBuilder.create()
+
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             // функция редактирования
@@ -54,7 +73,11 @@ class FeedFragment : Fragment() {
             }
 
             override fun onLike(post: Post) {
-                viewModel.likeById(post)
+                if (authViewModel.authenticated) {
+                    viewModel.likeById(post)
+                } else {
+                    dialog.show()
+                }
             }
 
             override fun onShare(post: Post) {
@@ -182,12 +205,20 @@ class FeedFragment : Fragment() {
 
         // переход на фрагмент создания поста по клику кнопки +
         binding.newPostButton.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_feedFragment_to_newPostFragment,
-                Bundle().apply {
-                    textArg = viewModel.getDraft()
-                })
+            if (authViewModel.authenticated) {
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_newPostFragment,
+                    Bundle().apply {
+                        textArg = viewModel.getDraft()
+                    })
+            } else {
+                dialog.show()
+            }
+
         }
+
+
+
         return binding.root
     }
 }
