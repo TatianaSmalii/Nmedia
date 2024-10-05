@@ -20,13 +20,19 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.textArg
-import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.ActivityAppBinding
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.AuthViewModel
+import ru.netology.nmedia.viewmodel.ViewModelFactory
 
 class AppActivity : AppCompatActivity() {
+    private val dependencyContainer = DependencyContainer.getInstance()
+    val viewModel: AuthViewModel by viewModels(
+        factoryProducer = {
+            ViewModelFactory(dependencyContainer.repository, dependencyContainer.appAuth, dependencyContainer.apiService)
+        }
+    )
 
-    val viewModel by viewModels<AuthViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +66,7 @@ class AppActivity : AppCompatActivity() {
 
         }
 
-//      // обновление (принудительное) меню (items) в корутине при изменении данных модели AppViewModel
+//      // обновление (принудительное) меню (items) в корутине при изменении данных модели AuthViewModel
         lifecycleScope.launch {
             // корутина работает только при открытом приложении
             lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -92,7 +98,7 @@ class AppActivity : AppCompatActivity() {
                     }
 
                     R.id.signout -> {
-                        AppAuth.getInstance().removeAuth()
+                        dependencyContainer.appAuth.removeAuth()
                         true
                     }
 
