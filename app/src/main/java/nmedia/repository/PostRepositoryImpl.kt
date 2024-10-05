@@ -160,10 +160,10 @@ class PostRepositoryImpl(
         val response: Response<Post>
         postDao.likeById(post.id)
         try {
-            if (!post.likedByMe) {
-                response = PostsApi.retrofitService.likeById(post.id)
+            response = if (!post.likedByMe) {
+                PostsApi.retrofitService.likeById(post.id)
             } else {
-                response = PostsApi.retrofitService.dislikeById(post.id)
+                PostsApi.retrofitService.dislikeById(post.id)
             }
 
             if (!response.isSuccessful) {
